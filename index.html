@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กิจกรรมแฟนพันธุ์แท้สุนทรภู่ สู่ประตูทะลุมิติ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <div class="ocean-bg">
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+    </div>
+
+    <div class="container">
+        
+        <section id="screen-welcome" class="card active">
+            <div class="thai-frame"></div>
+            <div class="logo-area">
+                <div class="portal-gate">🌀</div>
+            </div>
+            <h1>แฟนพันธุ์แท้สุนทรภู่<br><span class="highlight">สู่ประตูทะลุมิติ</span></h1>
+            <p class="subtitle">กิจกรรมเนื่องในวันสุนทรภู่ ระดับชั้นมัธยมศึกษาปีที่ ๑-๖</p>
+            
+            <div class="form-group">
+                <label for="student-name">กรอกชื่อ - นามสกุล เพื่อเริ่มการเดินทาง</label>
+                <input type="text" id="student-name" placeholder="ตัวอย่าง: เด็กชายรักไทย ใจดี" autocomplete="off">
+            </div>
+            <button id="btn-start" class="btn btn-gold">เริ่มการเดินทาง 🧭</button>
+        </section>
+
+        <section id="screen-game" class="card">
+            <div class="game-header">
+                <span id="gate-number" class="badge">ประตูที่ 1 / 20</span>
+                <div class="progress-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+            </div>
+            <div id="question-text" class="question-box">
+                คำถามกำลังโหลด...
+            </div>
+            <div id="options-container" class="options-grid">
+                </div>
+        </section>
+
+        <section id="screen-gameover" class="card">
+            <div class="failed-icon">🌊</div>
+            <h2>เรือแห่งกาลเวลาแตก!</h2>
+            <p class="failed-text">ท่านอับปางลงกลางมหาสมุทรวรรณคดี เนื่องจากตอบคำถามไม่ถูกต้องตามหลักแฟนพันธุ์แท้</p>
+            <button id="btn-retry" class="btn btn-danger">กลับไปเริ่มต้นใหม่ที่ข้อ 1 🔄</button>
+        </section>
+
+        <section id="screen-success" class="card">
+            <div class="success-icon">🏆</div>
+            <h2>ยินดีด้วย!</h2>
+            <p class="success-main-text">คุณได้พิสูจน์ตนแล้วว่าเป็น <br><strong class="highlight text-large">“แฟนพันธุ์แท้สุนทรภู่”</strong></p>
+            <div class="cert-info">
+                <p>เลขที่เกียรติบัตร: <span id="cert-id-display" class="gold-text">SP-2569-XXXX</span></p>
+            </div>
+            <button id="btn-download-cert" class="btn btn-gold">📜 รับเกียรติบัตร PDF</button>
+        </section>
+        
+    </div>
+
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

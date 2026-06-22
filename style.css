@@ -1,0 +1,319 @@
+:root {
+    --primary-blue: #0B2447;
+    --royal-blue: #19376D;
+    --light-blue: #A5D7E8;
+    --gold-ancient: #D4AF37;
+    --gold-light: #F3E5AB;
+    --white: #FFFFFF;
+    --danger: #A61F1F;
+    --transition: all 0.3s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Sarabun', 'Kanit', sans-serif;
+    background-color: var(--primary-blue);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* แอนิเมชันพื้นหลังคลื่นทะเล */
+.ocean-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.25;
+}
+
+.wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 200%;
+    height: 300px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2319376D" fill-opacity="1" d="M0,192L60,186.7C120,181,240,171,360,186.7C480,203,600,245,720,245.3C840,245,960,203,1080,181.3C1200,160,1320,160,1380,160L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path></svg>') repeat-x;
+    animation: waveMotion 20s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+    transform: translate3d(0, 0, 0);
+}
+
+.wave2 {
+    bottom: 10px;
+    opacity: 0.5;
+    animation: waveMotion 12s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite reverse;
+}
+
+@keyframes waveMotion {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* คอนเทนเนอร์และมิติของหน้าต่างการเล่น */
+.container {
+    width: 100%;
+    max-width: 650px;
+    padding: 20px;
+    z-index: 2;
+}
+
+.card {
+    background: linear-gradient(135deg, rgba(11, 36, 71, 0.95), rgba(25, 55, 109, 0.95));
+    border: 2px solid var(--gold-ancient);
+    border-radius: 15px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(212, 175, 55, 0.2);
+    text-align: center;
+    position: relative;
+    display: none;
+    backdrop-filter: blur(10px);
+}
+
+.card.active {
+    display: block;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-family: 'Kanit', sans-serif;
+    font-weight: 600;
+    font-size: 2.2rem;
+    color: var(--white);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+}
+
+.highlight {
+    color: var(--gold-ancient);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.text-large {
+    font-size: 1.8rem;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.subtitle {
+    font-size: 1.05rem;
+    color: var(--light-blue);
+    margin-bottom: 30px;
+}
+
+/* ลายไทยประยุกต์ขอบมุม */
+.thai-frame {
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    pointer-events: none;
+    border-radius: 12px;
+}
+
+/* ประตูมิติอนิเมชัน */
+.portal-gate {
+    font-size: 4rem;
+    display: inline-block;
+    animation: rotatePortal 6s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes rotatePortal {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ส่วนฟอร์มรับข้อมูล */
+.form-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: var(--light-blue);
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 1.1rem;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    border-radius: 8px;
+    background-color: rgba(11, 36, 71, 0.7);
+    color: var(--white);
+    text-align: center;
+    transition: var(--transition);
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold-ancient);
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+}
+
+/* ส่วนประกอบในหน้าเล่นเกม (Gameplay UI) */
+.game-header {
+    margin-bottom: 25px;
+}
+
+.badge {
+    background-color: var(--gold-ancient);
+    color: var(--primary-blue);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    display: inline-block;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.progress-container {
+    background-color: rgba(25, 55, 109, 0.6);
+    border-radius: 10px;
+    height: 10px;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid rgba(165, 215, 232, 0.2);
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--gold-ancient), #FFE07D);
+    width: 0%;
+    height: 100%;
+    transition: width 0.4s ease-out;
+}
+
+.question-box {
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+/* ออกแบบปุ่มและ Choice */
+.btn {
+    width: 100%;
+    padding: 14px 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    font-family: 'Kanit', sans-serif;
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, var(--gold-ancient), #B8901C);
+    color: var(--primary-blue);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-option {
+    background-color: rgba(25, 55, 109, 0.7);
+    color: var(--white);
+    border: 1.5px solid rgba(165, 215, 232, 0.3);
+    text-align: left;
+    padding: 16px 20px;
+    font-size: 1.05rem;
+    font-family: 'Sarabun', sans-serif;
+    display: flex;
+    align-items: center;
+}
+
+.btn-option:hover {
+    background-color: rgba(165, 215, 232, 0.15);
+    border-color: var(--gold-ancient);
+    transform: translateX(4px);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: var(--white);
+    box-shadow: 0 5px 15px rgba(166, 31, 31, 0.3);
+}
+
+.btn-danger:hover {
+    background-color: #BD2A2A;
+    transform: translateY(-2px);
+}
+
+/* ส่วนแสดงผลสถานะจบเกม */
+.failed-icon, .success-icon {
+    font-size: 4.5rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.failed-text, .success-main-text {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    color: var(--light-blue);
+}
+
+.cert-info {
+    background-color: rgba(11, 36, 71, 0.6);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px dashed var(--gold-ancient);
+    margin-bottom: 25px;
+}
+
+.gold-text {
+    color: var(--gold-ancient);
+    font-weight: bold;
+}
+
+/* Responsive UI สำหรับสมาร์ตโฟน */
+@media (max-width: 480px) {
+    .card {
+        padding: 30px 15px;
+    }
+    h1 {
+        font-size: 1.7rem;
+    }
+    .question-box {
+        font-size: 1.15rem;
+    }
+    .btn-option {
+        font-size: 0.95rem;
+        padding: 12px 15px;
+    }
+}
