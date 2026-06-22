@@ -26,7 +26,6 @@ function switchScreen(screenId) {
 // อัลกอริทึมสร้างและสุ่มชุดข้อสอบ (20 ข้อ จากสัดส่วนความยากเท่าๆ กัน)
 function generateGameQuestions() {
     let selected = [];
-    // ดึงแบบสุ่มจากทุกหมวดหมู่ ความยากละ 5 ข้อ (5 * 4 = 20 ข้อพอดี)
     selected = selected.concat(getRandomSubset(questionBank.easy, 5));
     selected = selected.concat(getRandomSubset(questionBank.medium, 5));
     selected = selected.concat(getRandomSubset(questionBank.hard, 5));
@@ -58,15 +57,12 @@ function startQuiz() {
 function renderQuestion() {
     const currentQuestion = currentQuestions[currentIndex];
     
-    // อัปเดตข้อมูลหัวเรื่องความคืบหน้า
     document.getElementById("gate-number").innerText = `ประตูที่ ${currentIndex + 1} / 20`;
     const progressPercent = (currentIndex / 20) * 100;
     document.getElementById("progress-bar").style.width = `${progressPercent}%`;
     
-    // อัปเดตโจทย์
     document.getElementById("question-text").innerText = currentQuestion.q;
     
-    // อัปเดตตัวเลือก (Choice)
     const container = document.getElementById("options-container");
     container.innerHTML = "";
     
@@ -84,34 +80,26 @@ function handleAnswer(selectedIdx) {
     const currentQuestion = currentQuestions[currentIndex];
     
     if (selectedIdx === currentQuestion.answer) {
-        // ตอบถูก
         currentIndex++;
         if (currentIndex >= 20) {
-            // สำเร็จภารกิจผ่านด่านทั้งหมดครบ 20 ข้อ
             processSuccess();
         } else {
-            // ไปข้อถัดไป
             renderQuestion();
         }
     } else {
-        // ตอบผิด -> ระบบบังคับเรือแตก ย้อนกลับเริ่มต้นใหม่ทันทีตามกฎ
         switchScreen("screen-gameover");
     }
 }
 
 // จัดการเมื่อผ่านกิจกรรมสำเร็จ
 function processSuccess() {
-    // อัปเดตแถบวัดความคืบหน้าให้เต็ม 100%
     document.getElementById("progress-bar").style.width = "100%";
     
-    // สร้างเลขอัตโนมัติในรูปแบบปีปัจจุบัน (2569)
     const timestampId = String(Date.now()).slice(-4);
     generatedCertId = `SP-2569-${timestampId}`;
     document.getElementById("cert-id-display").innerText = generatedCertId;
     
     switchScreen("screen-success");
-    
-    // บันทึกข้อมูลแบบ Asynchronous ลง Google Sheet ทันที
     saveDataToGoogleSheet();
 }
 
@@ -143,38 +131,51 @@ function saveDataToGoogleSheet() {
     }).catch(error => console.error("Error saving to sheet:", error));
 }
 
-// ฟังก์ชันสร้างไฟล์เกียรติบัตร PDF โดยการดึงภาพพื้นหลังสำเร็จรูปมาแสตมป์ชื่อนักเรียน
+// ฟังก์ชันสร้างไฟล์เกียรติบัตรโดยใช้ Canvas วาดตัวหนังสือไทยลงบนภาพโดยตรงเพื่อกันฟอนต์เพี้ยน
 function generatePDF() {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
-        orientation: "landscape",
-        unit: "mm",
-        format: "a4"
-    });
-
+    
     const img = new Image();
-    // ดึงไฟล์ภาพเกียรติบัตรตามชื่อที่คุณอุ้มตั้งไว้ในระบบจริง
     img.src = "certificate-bg.png.jpg"; 
 
     img.onload = function() {
-        // 1. วาดรูปเกียรติบัตรที่คุณอุ้มทำไว้ลงบน PDF เต็มแผ่น A4
-        doc.addImage(img, 'JPEG', 0, 0, 297, 210);
-
-        // 2. พิมพ์ชื่อนักเรียนลงไปตรงช่องว่าง (ใช้ฟอนต์สากลตัวหนาเพื่อความสากลและป้องกันสระไทยลอย-เพี้ยนหลังบ้าน)
-        doc.setFont("Helvetica", "bold");
-        doc.setFontSize(22);
-        doc.setTextColor(25, 55, 109); // สีน้ำเงินมืดเข้ากับตัวอักษรเดิมของคุณอุ้ม
+        // สร้างระบบ Canvas จำลองเพื่อเขียนข้อความไทยลงเนื้อภาพป้องกันสระลอย/ต่างดาว
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
         
-        // แปะชื่อลงตรงกลางแผ่น (X: 148.5 มม., Y: 89 มม. ปรับระยะให้อยู่กลางบรรทัดว่างพอดี)
-        doc.text(studentName, 148.5, 89, { align: "center" });
+        // กำหนดขนาดให้คมชัดสูงตามสัดส่วนภาพจริง
+        canvas.width = img.width;
+        canvas.height = img.height;
+        
+        // วาดภาพพื้นหลังลงไปก่อน
+        ctx.drawImage(img, 0, 0);
+        
+        // ตั้งค่าฟอนต์ภาษาไทยทั่วไปที่มีในเครื่องคอมพิวเตอร์และมือถือทุกเครื่อง
+        ctx.font = "bold " + Math.round(canvas.height * 0.045) + "px 'Sarabun', 'Sathu', 'Leelawadee', 'Microsoft YaHei', sans-serif";
+        ctx.fillStyle = "#19376D"; // สีน้ำเงินมืดสวยงามตามธีม
+        ctx.textAlign = "center";
+        
+        // พิมพ์ชื่อนักเรียนลงไปตรงกลางภาพเกียรติบัตร (คำนวณตำแหน่งพิกัด X, Y สัมพันธ์กับขนาดรูปพอดีเป๊ะ)
+        const nameX = canvas.width / 2;
+        const nameY = canvas.height * 0.428; 
+        ctx.fillText(studentName, nameX, nameY);
 
-        // 3. พิมพ์รหัสเกียรติบัตรไว้ที่มุมขวาล่างเบา ๆ 
-        doc.setFont("Helvetica", "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(120, 120, 120);
-        doc.text(`ID: ${generatedCertId}`, 275, 202, { align: "right" });
-
-        // สั่งดาวน์โหลดลงเครื่องคอมพิวเตอร์หรือสมาร์ตโฟน
+        // พิมพ์เลขที่เอกสารขนาดเล็กไว้มุมขวาล่าง
+        ctx.font = "normal " + Math.round(canvas.height * 0.018) + "px sans-serif";
+        ctx.fillStyle = "#787878";
+        ctx.textAlign = "right";
+        ctx.fillText(`ID: ${generatedCertId}`, canvas.width * 0.93, canvas.height * 0.96);
+        
+        // แปลงชิ้นงานทั้งหมดออกมารวมเป็นรูปเดียวส่งเข้า PDF
+        const finalImgData = canvas.toDataURL("image/jpeg", 1.0);
+        
+        const doc = new jsPDF({
+            orientation: "landscape",
+            unit: "mm",
+            format: "a4"
+        });
+        
+        doc.addImage(finalImgData, 'JPEG', 0, 0, 297, 210);
         doc.save(`เกียรติบัตร_${studentName}_วันสุนทรภู่.pdf`);
     };
 
