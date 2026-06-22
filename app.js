@@ -143,81 +143,42 @@ function saveDataToGoogleSheet() {
     }).catch(error => console.error("Error saving to sheet:", error));
 }
 
-// ฟังก์ชันสร้างไฟล์เกียรติบัตร PDF โดยจำลองดีไซน์ดนตรีและลวดลายตามภาพต้นฉบับ
+// ฟังก์ชันสร้างไฟล์เกียรติบัตร PDF โดยการดึงภาพพื้นหลังสำเร็จรูปมาแสตมป์ชื่อนักเรียน
 function generatePDF() {
     const { jsPDF } = window.jspdf;
-    // สร้างเอกสารแนวนอนขนาด A4 (297mm x 210mm)
     const doc = new jsPDF({
         orientation: "landscape",
         unit: "mm",
         format: "a4"
     });
 
-    // 1. วาดดีไซน์พื้นหลังธีมโรงเรียนเฉลิมพระเกียรติ (น้ำเงิน-ทอง)
-    doc.setFillColor(11, 36, 71); // น้ำเงินหลักมืด
-    doc.rect(0, 0, 297, 210, "F");
-    
-    // กรอบในไล่สีเหลืองทองโบราณสว่าง
-    doc.setDrawColor(212, 175, 55);
-    doc.setLineWidth(1.5);
-    doc.rect(8, 8, 281, 194, "D");
-    doc.setDrawColor(243, 229, 171);
-    doc.setLineWidth(0.5);
-    doc.rect(10, 10, 277, 190, "D");
+    const img = new Image();
+    // ดึงไฟล์ภาพเกียรติบัตรตามชื่อที่คุณอุ้มตั้งไว้ในระบบจริง
+    img.src = "certificate-bg.png.jpg"; 
 
-    // พื้นหลังตรงกลางจำลองเป็นสีกระดาษโบราณนวลตาสว่างขึ้น
-    doc.setFillColor(248, 246, 240);
-    doc.rect(12, 12, 273, 186, "F");
+    img.onload = function() {
+        // 1. วาดรูปเกียรติบัตรที่คุณอุ้มทำไว้ลงบน PDF เต็มแผ่น A4
+        doc.addImage(img, 'JPEG', 0, 0, 297, 210);
 
-    // 2. การจัดการพิมพ์ข้อความและจัดระเบียบ Text Alignment
-    doc.setFont("Sarabun", "normal");
-    
-    // หัวข้อหลักของสถาบัน
-    doc.setTextColor(25, 55, 109);
-    doc.setFontSize(24);
-    doc.text("โรงเรียนเฉลิมพระเกียรติ ๖๐ พรรษา", 148.5, 45, { align: "center" });
-    
-    doc.setFontSize(16);
-    doc.setTextColor(80, 80, 80);
-    doc.text("เกียรติบัตรฉบับนี้ให้ไว้เพื่อแสดงว่า", 148.5, 60, { align: "center" });
+        // 2. พิมพ์ชื่อนักเรียนลงไปตรงช่องว่าง (ใช้ฟอนต์สากลตัวหนาเพื่อความสากลและป้องกันสระไทยลอย-เพี้ยนหลังบ้าน)
+        doc.setFont("Helvetica", "bold");
+        doc.setFontSize(22);
+        doc.setTextColor(25, 55, 109); // สีน้ำเงินมืดเข้ากับตัวอักษรเดิมของคุณอุ้ม
+        
+        // แปะชื่อลงตรงกลางแผ่น (X: 148.5 มม., Y: 89 มม. ปรับระยะให้อยู่กลางบรรทัดว่างพอดี)
+        doc.text(studentName, 148.5, 89, { align: "center" });
 
-    // 3. ชื่อผู้เรียน (จุดเปลี่ยนแปรผันตามระบบจัดวางกึ่งกลางชัดเจน สวยงามเด่นชัด)
-    doc.setFontSize(26);
-    doc.setTextColor(11, 36, 71);
-    // เพิ่มการขีดเส้นใต้สีทองใต้ชื่อเพื่อให้สง่างามยิ่งขึ้น
-    doc.text(studentName, 148.5, 82, { align: "center" });
-    doc.setDrawColor(212, 175, 55);
-    doc.setLineWidth(0.8);
-    doc.line(98, 86, 199, 86);
+        // 3. พิมพ์รหัสเกียรติบัตรไว้ที่มุมขวาล่างเบา ๆ 
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(120, 120, 120);
+        doc.text(`ID: ${generatedCertId}`, 275, 202, { align: "right" });
 
-    // 4. รายละเอียดกิจกรรมตามข้อมูลประกวดใบประกาศนียบัตรจริง
-    doc.setFontSize(16);
-    doc.setTextColor(166, 31, 31); // สีแดงชาดเน้นชื่อกิจกรรม
-    doc.text("ได้เข้าร่วมกิจกรรม “แฟนพันธุ์แท้สุนทรภู่ สู่ประตูทะลุมิติ”", 148.5, 104, { align: "center" });
-    
-    doc.setTextColor(80, 80, 80);
-    doc.setFontSize(14);
-    doc.text("ระดับชั้นมัธยมศึกษาปีที่ ๑-๖", 148.5, 114, { align: "center" });
-    doc.text("กิจกรรมวันสุนทรภู่ ประจำปีการศึกษา ๒๕๖๙", 148.5, 125, { align: "center" });
-    
-    doc.setFontSize(13);
-    doc.text("ขอให้ประสบความสุขความเจริญ และมุ่งพัฒนาตนเองสืบไป เทอญ", 148.5, 138, { align: "center" });
-    doc.text("ให้ไว้ ณ วันที่ ๒๖ เดือน มิถุนายน พ.ศ.๒๕๖๙", 148.5, 148, { align: "center" });
+        // สั่งดาวน์โหลดลงเครื่องคอมพิวเตอร์หรือสมาร์ตโฟน
+        doc.save(`เกียรติบัตร_${studentName}_วันสุนทรภู่.pdf`);
+    };
 
-    // 5. ลายเซ็นดิจิทัลผู้อำนวยการจำลองโครงสร้างระเบียบราชการ
-    doc.setDrawColor(80, 80, 80);
-    doc.setLineWidth(0.2);
-    doc.line(110, 168, 187, 168); // เส้นลงนาม
-    
-    doc.setFontSize(13);
-    doc.text("(นางธรรมสรณ์ บัวสาย)", 148.5, 176, { align: "center" });
-    doc.text("ผู้อำนวยการโรงเรียนเฉลิมพระเกียรติ ๖๐ พรรษา", 148.5, 184, { align: "center" });
-
-    // เลขที่รหัสตรวจสอบมุมขวาล่างของแผ่นใบประกาศ
-    doc.setFontSize(10);
-    doc.setTextColor(120, 120, 120);
-    doc.text(`เลขที่เอกสารสำแดง: ${generatedCertId}`, 280, 202, { align: "right" });
-
-    // บังคับดาวน์โหลดไฟล์ตั้งชื่ออัตโนมัติลงเครื่องคอมพิวเตอร์หรือสมาร์ตโฟน
-    doc.save(`เกียรติบัตร_${studentName}_วันสุนทรภู่.pdf`);
+    img.onerror = function() {
+        alert("ระบบหาไฟล์ภาพพื้นหลังไม่เจอ กรุณาตรวจสอบว่าในคลัง GitHub มีไฟล์ชื่อ certificate-bg.png.jpg อยู่หรือไม่ครับ");
+    };
 }
